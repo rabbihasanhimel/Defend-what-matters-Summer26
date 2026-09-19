@@ -229,6 +229,7 @@ $asset = 'assets/blacktag/';
       </div>
       <div class="board-act">
         <button class="act" id="loadPlan">Load the 2019 plan</button>
+        <button class="act act-good" id="loadBest">Load the clinical ranking</button>
         <button class="ghost" id="stopHere" hidden>Stop here and count it</button>
         <button class="act" id="startRestore" disabled>Start restoring</button>
       </div>

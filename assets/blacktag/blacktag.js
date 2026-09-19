@@ -23,7 +23,7 @@ var S, RT, reached, cardEls;
 
 function reset() {
   S = { stage:'brief', day:0, affected:0, severe:0, svc:{}, fired:{},
-        order:[], queue:[], lane:null, twist:null, over:false };
+        order:[], queue:[], lane:null, twist:null, over:false, rank:{}, plan:null };
   RT = { running:false, speed:1, last:0 };
   D.services.forEach(function (s) {
     S.svc[s.id] = { tag:null, status:'down', since:0, harm:0, mult:1, reinf:false };
@@ -77,8 +77,10 @@ function accrue(a, b) {
   });
 }
 
-/* headless run, same rules, used for the 2019 plan's number */
-function simulate(order, black) {
+/* headless run, same rules, used for the 2019 plan's number.
+   noTwist runs the world as it looks from the outside — no dirty backup —
+   which is the only world a ranking written on day one is allowed to assume. */
+function simulate(order, black, noTwist) {
   var day = 0, aff = 0, sev = 0, st = {}, done = 0, reinfAt = null;
   D.services.forEach(function (s) { st[s.id] = { down:true, since:0, mult:1 }; });
 
@@ -96,7 +98,7 @@ function simulate(order, black) {
     if (black[s.id]) continue;
     step(day + (s.systems / CAP) * st[s.id].mult);
     st[s.id].down = false; done++;
-    if (done === 3 && reinfAt === null) {            // same reinfection rule as the live run
+    if (!noTwist && done === 3 && reinfAt === null) {  // same reinfection rule as the live run
       var victim = null, c = 0;
       for (var j = 0; j < i; j++) { if (!black[order[j]]) { c++; if (c === 2) { victim = order[j]; break; } } }
       if (victim) { st[victim].down = true; st[victim].since = day; st[victim].mult = 1.6; reinfAt = day;
@@ -107,6 +109,93 @@ function simulate(order, black) {
 }
 
 function byId(id) { for (var i = 0; i < D.services.length; i++) if (D.services[i].id === id) return D.services[i]; return null; }
+
+/* ── the ranking ───────────────────────────────────────────────── *
+   The 2019 plan sorts by what the hospital owes its vendors. This sorts by
+   what the hospital owes its patients, which takes one number written down
+   in the open: what a time-critical patient is worth against an affected one.
+   It is a hundred, here, on the screen, where the jury and the CMO can both
+   argue with it. A weighting nobody can see is the thing we are replacing.  */
+var SEVERE_WEIGHT = 100;
+
+function harmRate(s) { return s.affected_day + SEVERE_WEIGHT * s.severe_day; }
+function laneDays(s) { return s.systems / CAP; }
+
+function scoreOrder(order, black) {
+  var r = simulate(order.slice(), black, true);
+  return r.affected + SEVERE_WEIGHT * r.severe;
+}
+
+/* Smith's rule for the seed — harm per day of Lou, heaviest first — then move
+   one service at a time until nothing improves. The seed is not already the
+   answer because of tolerance: a service finished inside its window costs
+   nothing at all, so it is worth pulling forward to catch one, and worth
+   dropping back if its window is wide enough to survive the wait.
+
+   A black tag here is only ever given to a service with no acute clinical
+   dependency. The machine is not allowed to trade patients for lane time —
+   that decision has two signatures on it and neither of them is this file. */
+function optimise() {
+  var black = {}, fixed = [], pool = [];
+  D.services.forEach(function (s) {
+    if (s.gate)            { fixed.push(s.id); return; }   // nothing authenticates without it
+    if (harmRate(s) === 0) { black[s.id] = 1;  return; }
+    pool.push(s);
+  });
+  pool.sort(function (a, b) { return harmRate(b) / laneDays(b) - harmRate(a) / laneDays(a); });
+
+  var order = fixed.concat(pool.map(function (s) { return s.id; }));
+  var best  = scoreOrder(order, black);
+  var lo    = fixed.length, n = order.length;
+
+  for (var pass = 0; pass < 12; pass++) {
+    var moved = false;
+    for (var i = lo; i < n; i++) {
+      for (var j = lo; j < n; j++) {
+        if (i === j) continue;
+        var t = order.slice();
+        t.splice(j, 0, t.splice(i, 1)[0]);
+        var c = scoreOrder(t, black);
+        if (c < best - 1e-9) { order = t; best = c; moved = true; }
+      }
+    }
+    if (!moved) break;
+  }
+  return { order: order, black: black };
+}
+
+/* The colour is the clinical category. The number is the order Lou can
+   actually get to it in. START keeps those two questions apart and so does
+   this board: red means harming patients today, not first in the queue.
+   Renal scheduling is amber and third — third because four systems and half
+   a day of Lou buys back thirty patients a day, amber because its clock does
+   not start for seventy-two hours. Done third, it never bleeds at all.     */
+function band(s) {
+  if (s.gate) return 'red';                    // nothing else authenticates until it is back
+  if (s.tolerance_h == null) return 'green';
+  if (s.tolerance_h <= 12)   return 'red';     // bleeding before the end of the first day
+  if (s.tolerance_h <= 72)   return 'amber';
+  return 'green';
+}
+
+/* lay the ranking on the board: a category on every card, a number on every
+   card, and the black tags signed into the ledger exactly as a human's are. */
+function applyRanking() {
+  var r = optimise();
+
+  S.plan = r.order.slice();
+  S.rank = {};
+  r.order.forEach(function (id, i) {
+    S.rank[id] = i + 1;
+    S.svc[id].tag = band(byId(id));
+  });
+  paintBoard();
+  Object.keys(r.black).forEach(function (id) {
+    if (S.svc[id].tag !== 'black') tag(id, 'black', cardEls[id]);
+  });
+  paintBoard();
+  return r;
+}
 
 /* ── log ───────────────────────────────────────────────────────── */
 function logLine(time, text, cls) {
@@ -186,6 +275,8 @@ function card(s) {
   if (inQ)  el.classList.add('queued');
 
   el.innerHTML =
+    (S.rank && S.rank[s.id] && st.tag !== 'black' && st.status === 'down'
+      ? '<span class="c-rank">' + S.rank[s.id] + '</span>' : '') +
     (st.status === 'restored' ? '<span class="c-back">back</span>' : '') +
     (st.reinf && st.status === 'down' ? '<span class="c-back c-again">encrypting again</span>' : '') +
     (live ? '<span class="c-back c-live">validating</span>' : '') +
@@ -612,10 +703,21 @@ function startRestore() {
   $('#boardSub').innerHTML = 'One service is validated at a time, because there is one Lou. ' +
     'Queue what comes next before the lane empties. Black is final.';
   $('#loadPlan').hidden = true;
+  $('#loadBest').hidden = true;
   $('#startRestore').hidden = true;
   $('#stopHere').hidden = false;
   logLine('08:20', 'Six hours to agree the board. Dr. Mercier signs the black tags at 08:14 and asks ' +
     'to be told before any of them change.', 'sys');
+
+  /* if the ranking was loaded, it is an order and not just a set of colours,
+     so the queue starts full. Pull anything out of it you disagree with. */
+  if (S.plan) {
+    S.plan.forEach(function (id) { if (restorable(id) && S.queue.indexOf(id) < 0) S.queue.push(id); });
+    pullLane();
+    logLine('08:20', 'Queue loaded from the clinical ranking, ' + S.plan.length +
+      ' services deep. Click anything in it to take it back out.', 'sys');
+  }
+
   paintBoard(); paintMeters(); fireEvents();
   setSpeed(1); setRunning(true);
   paintClock(true);
@@ -708,12 +810,37 @@ function boot() {
   $$('.tb.sp').forEach(function (b) { b.onclick = function () { setSpeed(+b.dataset.sp); }; });
 
   $('#loadPlan').onclick = function () {
+    S.plan = null; S.rank = {};
     D.services.slice().sort(function (a, b) { return a.tier2019 - b.tier2019; })
       .forEach(function (s, i) { S.svc[s.id].tag = i < 5 ? 'red' : i < 10 ? 'amber' : 'green'; });
     paintBoard();
-    toast('The 2019 plan', 'This is what the hospital already has. It ranks every system by vendor ' +
+    toast('The 2019 disaster recovery plan',
+      'The 2019 plan sorts the hospital by IT tier. IT tier is negotiated with suppliers by ' +
       'contract value and support SLA, which is why payroll sits above radiology. Nothing in it is ' +
       'black. Change it.', [['Understood', null]]);
+  };
+
+  $('#loadBest').onclick = function () {
+    var r     = applyRanking();
+    var mine  = simulate(S.plan.slice(), r.black);
+    var base  = simulate(D.services.slice().sort(function (a, b) { return a.tier2019 - b.tier2019; })
+                          .map(function (s) { return s.id; }), {});
+    var blk   = Object.keys(r.black);
+    var freed = blk.reduce(function (n, id) { return n + byId(id).systems; }, 0);
+    var r100  = function (v) { return (Math.round(v / 100) * 100).toLocaleString('en'); };
+
+    toast('The clinical ranking',
+      'Same ' + D.total + ' systems. The colour is the clinical category — red is harming patients ' +
+      'before tonight. The number is the order, which is a different question, because there is one ' +
+      'Lou: harm per day of downtime, divided by the days of validation it costs to stop it. One ' +
+      'time-critical patient is priced at ' + SEVERE_WEIGHT + ' affected, and that number is on the ' +
+      'screen rather than in somebody&rsquo;s head.<br><br>' +
+      blk.map(function (id) { return byId(id).name; }).join(' and ') + ' take black tags: no acute ' +
+      'clinical dependency inside the horizon, ' + freed + ' systems Lou never opens. Both are signed.<br><br>' +
+      'Projected: about ' + r100(mine.affected) + ' patients affected and ' + Math.round(mine.severe) +
+      ' time-critical, against about ' + r100(base.affected) + ' and ' + Math.round(base.severe) +
+      ' for the 2019 plan. Start restoring and the queue runs in this order.',
+      [['Understood', null]]);
   };
   $('#again').onclick = function () {
     try { localStorage.removeItem('bt.ledger'); } catch(e){}

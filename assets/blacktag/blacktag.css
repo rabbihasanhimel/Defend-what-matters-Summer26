@@ -110,6 +110,8 @@ p{margin:0 0 .85em}
 .act:hover{background:rgba(211,60,76,.2);box-shadow:0 0 24px rgba(211,60,76,.3)}
 .act:active{transform:translateY(1px)}
 .act:disabled{border-color:var(--line);background:none;color:var(--faint);box-shadow:none;cursor:default}
+.act.act-good{border-color:var(--pist);background:rgba(138,171,92,.09);color:var(--pist)}
+.act.act-good:hover{background:rgba(138,171,92,.2);box-shadow:0 0 24px rgba(138,171,92,.26);color:var(--bone)}
 .ghost{padding:11px 18px;border:1px solid var(--line);font:500 10.5px/1 PlexM;letter-spacing:.12em;
   text-transform:uppercase;color:var(--dim);transition:color .25s,border-color .25s}
 .ghost:hover{color:var(--bone);border-color:var(--brass)}
@@ -191,6 +193,10 @@ p{margin:0 0 .85em}
 .c-tol{color:var(--saff)}
 .c-harm{margin-top:7px;height:2px;background:var(--line2);overflow:hidden}
 .c-harm i{display:block;height:100%;background:var(--rose);width:0;transition:width .6s var(--ease)}
+.c-rank{position:absolute;top:7px;right:8px;min-width:18px;padding:2px 4px;text-align:center;
+  font:500 9.5px/1 PlexM;letter-spacing:.05em;color:var(--brass);border:1px solid var(--line);
+  background:rgba(8,10,12,.75);border-radius:2px}
+.card.restored .c-rank,.card[data-tag=black] .c-rank{display:none}
 .c-next{position:absolute;top:8px;right:9px;font:500 9.5px/1 PlexM;letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink);background:var(--bone);padding:4px 6px;opacity:0;transition:opacity .25s}
 .card.pick .c-next{opacity:1}
