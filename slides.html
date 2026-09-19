@@ -189,6 +189,26 @@ html, body {
   font-family: PlexM; font-size: 12px;
 }
 .nav-btn:hover { border-color: var(--bone); }
+
+@media (max-width: 960px) {
+  .slide { padding: 70px 5vw 80px; overflow-y: auto; justify-content: flex-start; }
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { grid-template-columns: 1fr; gap: 14px; }
+  .chrome { padding: 12px 18px; }
+  .nav-bar { padding: 12px 18px; }
+  .quote-box p { font-size: 16px; }
+  .card { padding: 16px; }
+  .card-val { font-size: 26px; }
+}
+@media (max-width: 600px) {
+  .grid-2, .grid-4 { grid-template-columns: 1fr; gap: 10px; }
+  .chrome-brand { font-size: 11px; }
+  .timer-pill { padding: 4px 8px; font-size: 11px; }
+  .nav-dots { display: none; }
+  .slide h1 { font-size: 28px; }
+  .slide h2 { font-size: 22px; }
+  .sub-lede { font-size: 15px; margin-bottom: 20px; }
+}
 </style>
 </head>
 <body>
