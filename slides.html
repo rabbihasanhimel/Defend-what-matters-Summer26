@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLACK TAG — 5-Minute Hackathon Pitch</title>
+<style>
+@font-face{font-family:PlexS;src:url(assets/blacktag/fonts/plex-sans-400.woff2)format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:PlexS;src:url(assets/blacktag/fonts/plex-sans-500.woff2)format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:PlexS;src:url(assets/blacktag/fonts/plex-sans-600.woff2)format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:PlexS;src:url(assets/blacktag/fonts/plex-sans-700.woff2)format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:PlexM;src:url(assets/blacktag/fonts/plex-mono-400.woff2)format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:PlexM;src:url(assets/blacktag/fonts/plex-mono-500.woff2)format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:PlexM;src:url(assets/blacktag/fonts/plex-mono-600.woff2)format("woff2");font-weight:600;font-display:swap}
+
+:root {
+  --bg: #08090a;
+  --panel: rgba(18, 20, 24, 0.85);
+  --panel-border: rgba(231, 226, 216, 0.12);
+  --bone: #e7e2d8;
+  --dim: #948e83;
+  --faint: #5d584f;
+  --rose: #d33c4c;
+  --rose-dim: rgba(211, 60, 76, 0.15);
+  --gold: #b79554;
+  --gold-dim: rgba(183, 149, 84, 0.15);
+  --pist: #8aab5c;
+  --pist-dim: rgba(138, 171, 92, 0.15);
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: var(--bg); color: var(--bone);
+  font-family: PlexS, system-ui, sans-serif;
+  user-select: none;
+}
+
+/* Background grid & vignette */
+.backdrop {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: 
+    radial-gradient(ellipse at 50% 20%, rgba(211, 60, 76, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(8,9,10,0.4) 0%, rgba(8,9,10,0.95) 100%);
+}
+.backdrop::after {
+  content: ""; position: absolute; inset: 0; opacity: 0.15;
+  background-image: linear-gradient(var(--panel-border) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--panel-border) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Chrome / Presentation Bar */
+.chrome {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 36px;
+  background: linear-gradient(180deg, rgba(8,9,10,0.9), transparent);
+}
+.chrome-brand {
+  font-family: PlexM; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.chrome-brand b { color: var(--gold); font-weight: 600; }
+.chrome-meta {
+  display: flex; align-items: center; gap: 20px; font-family: PlexM; font-size: 12px; color: var(--dim);
+}
+.timer-pill {
+  background: rgba(255,255,255,0.06); padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--panel-border); font-variant-numeric: tabular-nums;
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.timer-pill.warning { color: var(--gold); border-color: var(--gold); }
+.timer-pill.danger { color: var(--rose); border-color: var(--rose); animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Slides container */
+.deck {
+  position: relative; z-index: 1; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 8vw 90px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), visibility 0.4s;
+}
+.slide.active {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Slide Typography & Elements */
+.tag-line {
+  font-family: PlexM; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--rose); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.tag-line::before {
+  content: ""; width: 8px; height: 8px; background: var(--rose); display: inline-block; border-radius: 2px;
+}
+.slide h1 {
+  font-size: clamp(38px, 4.4vw, 68px); font-weight: 600; line-height: 1.08;
+  letter-spacing: -0.02em; margin-bottom: 24px; color: var(--bone);
+}
+.slide h2 {
+  font-size: clamp(28px, 3.2vw, 44px); font-weight: 600; line-height: 1.15;
+  letter-spacing: -0.015em; margin-bottom: 24px; color: var(--bone);
+}
+.sub-lede {
+  font-size: clamp(17px, 1.6vw, 22px); line-height: 1.55; color: var(--dim);
+  max-width: 48ch; margin-bottom: 36px;
+}
+.highlight { color: var(--gold); }
+.highlight-rose { color: var(--rose); }
+.highlight-pist { color: var(--pist); }
+
+/* Grids & Cards */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 1200px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; max-width: 1200px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; width: 100%; max-width: 1200px; }
+
+.card {
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 4px;
+  padding: 24px; backdrop-filter: blur(12px); position: relative;
+}
+.card-h { font-family: PlexM; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim); margin-bottom: 10px; }
+.card-val { font-family: PlexM; font-size: 34px; font-weight: 600; line-height: 1; margin-bottom: 8px; }
+.card-desc { font-size: 13.5px; line-height: 1.5; color: var(--dim); }
+
+.card.hero-card {
+  border-color: rgba(211, 60, 76, 0.4);
+  background: linear-gradient(135deg, rgba(211,60,76,0.1), rgba(14,15,17,0.9));
+}
+.card.gold-card {
+  border-color: rgba(183, 149, 84, 0.4);
+  background: linear-gradient(135deg, rgba(183,149,84,0.1), rgba(14,15,17,0.9));
+}
+
+/* Callout Quote */
+.quote-box {
+  border-left: 3px solid var(--gold); padding: 18px 24px;
+  background: rgba(183, 149, 84, 0.05); border-radius: 0 4px 4px 0;
+  max-width: 780px; margin: 20px 0;
+}
+.quote-box p { font-size: 19px; line-height: 1.5; font-style: italic; color: var(--bone); }
+.quote-box cite { display: block; margin-top: 10px; font-family: PlexM; font-size: 12px; color: var(--gold); font-style: normal; }
+
+/* Demo Button Callout */
+.demo-cta {
+  display: inline-flex; align-items: center; gap: 14px;
+  background: var(--rose); color: #fff; padding: 16px 32px; border-radius: 4px;
+  font-family: PlexM; font-size: 14px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; text-decoration: none; transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 0 30px rgba(211, 60, 76, 0.4); cursor: pointer;
+}
+.demo-cta:hover { transform: translateY(-2px); background: #e04455; }
+
+/* Speaker Notes Panel (Press 'N') */
+.notes-panel {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: rgba(10, 11, 13, 0.96); border-top: 2px solid var(--gold);
+  padding: 20px 36px; max-height: 180px; overflow-y: auto;
+  font-size: 14px; line-height: 1.6; color: #ddd;
+  display: none; box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+}
+.notes-panel.visible { display: block; }
+.notes-panel b { color: var(--gold); font-family: PlexM; font-size: 12px; letter-spacing: 0.1em; }
+
+/* Bottom Progress Bar & Navigation */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 36px; background: linear-gradient(0deg, rgba(8,9,10,0.95), transparent);
+}
+.nav-dots { display: flex; gap: 8px; }
+.dot {
+  width: 32px; height: 3px; background: var(--panel-border); border-radius: 2px;
+  transition: background 0.3s, width 0.3s; cursor: pointer;
+}
+.dot.active { background: var(--rose); width: 50px; }
+.nav-controls {
+  display: flex; gap: 12px; font-family: PlexM; font-size: 12px; color: var(--faint);
+}
+.nav-btn {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  color: var(--bone); padding: 8px 14px; border-radius: 4px; cursor: pointer;
+  font-family: PlexM; font-size: 12px;
+}
+.nav-btn:hover { border-color: var(--bone); }
+</style>
+</head>
+<body>
+
+<div class="backdrop"></div>
+
+<!-- Chrome -->
+<header class="chrome">
+  <div class="chrome-brand">
+    <span>The Turkish Delights</span> &middot; <b>BLACK<i>TAG</i></b> &middot; Track A
+  </div>
+  <div class="chrome-meta">
+    <div class="timer-pill" id="timerPill" title="Click to start/reset 5:00 presentation timer">
+      <span>⏱</span> <span id="timerDisplay">00:00 / 05:00</span>
+    </div>
+    <div id="slideCounter">01 / 07</div>
+  </div>
+</header>
+
+<!-- Slides Deck -->
+<main class="deck">
+
+  <!-- SLIDE 1: Title & Defenders -->
+  <section class="slide active" data-slide="1" data-notes="SPEAKER 1 (0:00 - 0:45): Introduce the team and the exact scenario in CyberCity. Name the four defenders. Stress that CyberCity General Hospital is mid-attack with 204 systems encrypted.">
+    <div class="tag-line">IACyC 2026 &middot; Track A &middot; Resilience Under Attack</div>
+    <h1>Machine Triage for the<br>Four People Restoring a Hospital.</h1>
+    <p class="sub-lede">
+      CyberCity General Hospital &middot; Incident CCG-2026-0919 &middot; Saturday 02:14
+    </p>
+
+    <div class="grid-4" style="margin-top: 10px;">
+      <div class="card">
+        <div class="card-h">Paul</div>
+        <div class="card-val" style="font-size: 18px; color: var(--gold);">IT Manager</div>
+        <div class="card-desc">14 years here. Only person with offline tape keys. Hour 31 awake.</div>
+      </div>
+      <div class="card">
+        <div class="card-h">François</div>
+        <div class="card-val" style="font-size: 18px;">Systems & Net</div>
+        <div class="card-desc">26 years old, 7 months in the post. Holding a perimeter he didn't design.</div>
+      </div>
+      <div class="card hero-card">
+        <div class="card-h">Lou &middot; The Bottleneck</div>
+        <div class="card-val" style="font-size: 18px; color: var(--rose);">Clinical Apps</div>
+        <div class="card-desc">The <b>only person</b> who knows clinical workflows. Every ward phones her.</div>
+      </div>
+      <div class="card">
+        <div class="card-h">Fred</div>
+        <div class="card-val" style="font-size: 18px;">Service Desk</div>
+        <div class="card-desc">Final-year student, 3 days/week. Triaging panicked clinicians on the phone.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: The Brutal Math -->
+  <section class="slide" data-slide="2" data-notes="SPEAKER 1 (0:45 - 1:30): Walk through the mathematical bottleneck. Restoring isn't copying files; it requires Lou's clinical validation. Show why traditional DR plans fail—they prioritize by vendor contract penalties instead of human life.">
+    <div class="tag-line">The Constraint &middot; Mathematical Reality</div>
+    <h2>Restoring a server is not copying a file.<br>It is clinical validation.</h2>
+    
+    <div class="grid-3" style="margin: 24px 0;">
+      <div class="card hero-card">
+        <div class="card-h">The Estate Down</div>
+        <div class="card-val" style="color: var(--rose);">204</div>
+        <div class="card-desc">Servers encrypted in 11 mins via GPO. Every ward reverted to paper.</div>
+      </div>
+      <div class="card">
+        <div class="card-h">Lou's Daily Capacity</div>
+        <div class="card-val" style="color: var(--bone);">9</div>
+        <div class="card-desc">Systems fully validated per day. Lou cannot be cloned.</div>
+      </div>
+      <div class="card hero-card">
+        <div class="card-h">Full Restore Horizon</div>
+        <div class="card-val" style="color: var(--rose);">22.7 <span style="font-size: 18px;">Days</span></div>
+        <div class="card-desc">Nearly a month. Stroke thrombolysis window is only 4.5 hours.</div>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <p>"The hospital's 2019 Disaster Recovery Plan orders systems by vendor contract penalty clauses—putting <b>Staff Payroll at Tier 1</b> and <b>Radiology PACS at Tier 8</b>. It assumes you restore everything. It never says what to skip."</p>
+      <cite>The Fatal Flaw of Standard IT DR</cite>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: The Insight (Black Tag) -->
+  <section class="slide" data-slide="3" data-notes="SPEAKER 2 (1:30 - 2:15): Introduce the breakthrough insight. Mass-casualty medicine already solved resource scarcity with START triage: Red, Amber, Green, Black. We brought this clinical discipline to IT systems.">
+    <div class="tag-line">The Innovation &middot; Clinical Triage for IT</div>
+    <h2>Hospitals already know who waits.<br>They never had an instrument for their machines.</h2>
+    <p class="sub-lede">
+      In disaster medicine, a <b class="highlight">Black Tag</b> means expectant: resources cannot be spent here when salvageable lives are on the line.
+    </p>
+
+    <div class="grid-4" style="margin-top: 10px;">
+      <div class="card" style="border-top: 3px solid var(--rose);">
+        <div class="card-h">Red Tag</div>
+        <div class="card-val" style="font-size: 20px; color: var(--rose);">Immediate</div>
+        <div class="card-desc">Hours to live. AD, EHR order entry, Acute Stroke PACS, ECG cath lab.</div>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--gold);">
+        <div class="card-h">Amber Tag</div>
+        <div class="card-val" style="font-size: 20px; color: var(--gold);">Delayed</div>
+        <div class="card-desc">Clinical tolerance 12-48h. Pharmacy interaction checker, theatre lists.</div>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--pist);">
+        <div class="card-h">Green Tag</div>
+        <div class="card-val" style="font-size: 20px; color: var(--pist);">Minor</div>
+        <div class="card-desc">Can wait days. Dietetics ordering, staff rostering, bed management.</div>
+      </div>
+      <div class="card hero-card" style="border-top: 3px solid #000; background: rgba(0,0,0,0.6);">
+        <div class="card-h" style="color: var(--gold);">Black Tag</div>
+        <div class="card-val" style="font-size: 20px; color: var(--gold);">Abandoned</div>
+        <div class="card-desc"><b>Zero acute clinical harm.</b> Oncology trial store (31 sys), legacy archive (18 sys).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: Live Demo Cue / Adversary Moment -->
+  <section class="slide" data-slide="4" data-notes="SPEAKER 2 & LIVE DRIVER (2:15 - 3:45): SWITCH TO BROWSER TAB! Run the demo: 1) Trigger GPO wave (adversary moment 1), 2) Black-tag research & archive to buy back 5.4 days of Lou's time, 3) Watch the queue run, 4) The dirty-backup re-infection twist (adversary moment 2).">
+    <div class="tag-line">Demonstration &middot; The Adversary Moment</div>
+    <h2>Watch the prototype respond to the attack.</h2>
+    <p class="sub-lede">
+      Running live on our machine &middot; 3D WebGL Estate &middot; Real-time harm engine &middot; Cryptographic chain.
+    </p>
+
+    <div class="grid-2" style="margin: 20px 0 34px;">
+      <div class="card hero-card">
+        <div class="card-h">Adversary Moment 1 &middot; 02:14</div>
+        <div class="card-val" style="font-size: 20px;">The 11-Minute Push</div>
+        <div class="card-desc">Watch domain controllers fall, followed by 16 departments. 3D visual shock and real-time clinical degradation.</div>
+      </div>
+      <div class="card hero-card">
+        <div class="card-h">Adversary Moment 2 &middot; Day 3</div>
+        <div class="card-val" style="font-size: 20px;">The Dirty Backup Twist</div>
+        <div class="card-desc">Persistence lived inside the 9-day dwell window. Restored system re-encrypts mid-flight, forcing dynamic re-triage.</div>
+      </div>
+    </div>
+
+    <div>
+      <a href="index.html" target="_blank" class="demo-cta">
+        Launch Live Demo &rarr;
+      </a>
+      <span style="font-family: PlexM; font-size: 12px; color: var(--faint); margin-left: 20px;">
+        (Alt-Tab to active browser session)
+      </span>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: The Reckoning & Numbers -->
+  <section class="slide" data-slide="5" data-notes="SPEAKER 3 (3:45 - 4:20): Walk through the results comparison. Black Tag saved 16 days of Lou's life and prevented hundreds of delayed stroke and cardiac interventions.">
+    <div class="tag-line">The Outcome &middot; What It Saved vs. What It Cost</div>
+    <h2>Your board against the 2019 DR plan.</h2>
+
+    <div class="grid-2" style="margin: 24px 0;">
+      <div class="card" style="border-color: rgba(211,60,76,0.3);">
+        <div class="card-h">The 2019 Plan (Blind Restore)</div>
+        <div class="card-val" style="color: var(--rose);">22.7 <span style="font-size: 20px;">Days</span></div>
+        <div class="card-desc" style="margin-top: 10px;">
+          &bull; <b>1,840+</b> patients delayed or deferred<br>
+          &bull; <b>38</b> missed acute interventions (stroke/STEMI)<br>
+          &bull; Payroll restored before acute radiology
+        </div>
+      </div>
+      <div class="card hero-card" style="border-color: var(--pist);">
+        <div class="card-h">BLACK TAG Strategy</div>
+        <div class="card-val" style="color: var(--pist);">6.8 <span style="font-size: 20px;">Days</span></div>
+        <div class="card-desc" style="margin-top: 10px;">
+          &bull; <b>70% reduction</b> in patient harm exposure<br>
+          &bull; Acute stroke & cath lab restored in <b>under 4 hours</b><br>
+          &bull; 49 non-acute systems black-tagged to save lives
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-box" style="border-color: var(--rose);">
+      <p>"Nobody is going to restore the legacy archive or the oncology trial store. That was a decision, signed by the Chief Medical Officer, and it is the reason the emergency room reopened on Tuesday."</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: The Cryptographic Shield -->
+  <section class="slide" data-slide="6" data-notes="SPEAKER 3 (4:20 - 4:45): Explain the cryptographic decision ledger. Why is SHA-256 hash chaining needed? To protect Paul legally so he isn't scapegoated at the 6-month inquiry for systems that weren't restored.">
+    <div class="tag-line">Legal & Moral Shield &middot; The Decision Ledger</div>
+    <h2>Paul should not carry a 4:12 AM decision alone six months later.</h2>
+    <p class="sub-lede">
+      Every black tag is cryptographically hash-chained and co-signed by IT and Clinical leadership.
+    </p>
+
+    <div class="grid-3" style="margin-top: 20px;">
+      <div class="card gold-card">
+        <div class="card-h">Dual Signature</div>
+        <div class="card-val" style="font-size: 22px; color: var(--gold);">Paul + Dr. Mercier</div>
+        <div class="card-desc">IT feasibility countersigned by Chief Medical Officer duty of care.</div>
+      </div>
+      <div class="card gold-card">
+        <div class="card-h">Tamper-Evident Ledger</div>
+        <div class="card-val" style="font-size: 22px; color: var(--bone);">SHA-256 Hash Chain</div>
+        <div class="card-desc">Each decision mathematically seals the previous. Cannot be altered in hindsight.</div>
+      </div>
+      <div class="card gold-card">
+        <div class="card-h">Board Inquiry Protection</div>
+        <div class="card-val" style="font-size: 22px; color: var(--bone);">Written Clinical Basis</div>
+        <div class="card-desc">Records clinical rationale: "No acute dependency within the restore horizon."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: Conclusion & Summary -->
+  <section class="slide" data-slide="7" data-notes="ALL SPEAKERS (4:45 - 5:00): Deliver the crisp final sentence. Thank the jury and open the floor for Q&A.">
+    <div class="tag-line">Conclusion &middot; The Turkish Delights</div>
+    <h1>Defend What Matters.</h1>
+    
+    <div class="quote-box" style="margin: 28px 0; border-color: var(--gold);">
+      <p style="font-size: 24px; font-weight: 500; font-style: normal; color: var(--bone);">
+        "Black Tag doesn't pretend four people can save every server.<br>
+        <span class="highlight">It makes sure they save the patients.</span>"
+      </p>
+    </div>
+
+    <div class="grid-3" style="margin-top: 30px;">
+      <div class="card">
+        <div class="card-h">Next Step</div>
+        <div class="card-desc">HL7/FHIR real-time emergency bed telemetry integration.</div>
+      </div>
+      <div class="card">
+        <div class="card-h">Code & Documentation</div>
+        <div class="card-desc">Full repo, team sheet, and ledger verifier ready on GitHub.</div>
+      </div>
+      <div class="card">
+        <div class="card-h">Team Deliverables</div>
+        <div class="card-desc">Backup recording, one-page team sheet handed to jury.</div>
+      </div>
+    </div>
+
+    <p style="margin-top: 30px; font-family: PlexM; font-size: 14px; color: var(--dim);">
+      Ready for Jury Questions &middot; Thank you.
+    </p>
+  </section>
+
+</main>
+
+<!-- Bottom Nav -->
+<footer class="nav-bar">
+  <div class="nav-dots" id="dotsContainer"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+    <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+    <button class="nav-btn" id="notesBtn" title="Toggle Speaker Notes [N]">Notes (N)</button>
+    <button class="nav-btn" id="fullBtn" title="Toggle Fullscreen [F]">Fullscreen (F)</button>
+  </div>
+</footer>
+
+<!-- Speaker Notes Drawer -->
+<div class="notes-panel" id="notesPanel">
+  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+    <b>SPEAKER CUES &amp; NOTES</b>
+    <span style="font-family:PlexM;font-size:11px;color:var(--faint);">Press 'N' to dismiss</span>
+  </div>
+  <div id="notesContent">Loading notes...</div>
+</div>
+
+<script>
+(function() {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsContainer = document.getElementById('dotsContainer');
+  const counter = document.getElementById('slideCounter');
+  const notesPanel = document.getElementById('notesPanel');
+  const notesContent = document.getElementById('notesContent');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const timerPill = document.getElementById('timerPill');
+  let currentIdx = 0;
+  let timerInterval = null;
+  let timerSeconds = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsContainer.appendChild(d);
+  });
+
+  function updateSlide() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === currentIdx));
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+    counter.textContent = String(currentIdx + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+    notesContent.textContent = slides[currentIdx].dataset.notes || 'No notes for this slide.';
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= slides.length) return;
+    currentIdx = idx;
+    updateSlide();
+  }
+
+  function next() { if (currentIdx < slides.length - 1) goTo(currentIdx + 1); }
+  function prev() { if (currentIdx > 0) goTo(currentIdx - 1); }
+
+  document.getElementById('nextBtn').onclick = next;
+  document.getElementById('prevBtn').onclick = prev;
+  document.getElementById('notesBtn').onclick = () => notesPanel.classList.toggle('visible');
+  document.getElementById('fullBtn').onclick = () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen().catch(()=>{});
+  };
+
+  // Keyboard navigation
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'n' || e.key === 'N') { notesPanel.classList.toggle('visible'); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+      else document.exitFullscreen().catch(()=>{});
+    }
+  });
+
+  // Presentation Timer (5:00 minutes)
+  function startTimer() {
+    if (timerInterval) return;
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      timerDisplay.textContent = `${m}:${s} / 05:00`;
+
+      if (timerSeconds >= 300) { // 5:00
+        timerPill.className = 'timer-pill danger';
+      } else if (timerSeconds >= 240) { // 4:00
+        timerPill.className = 'timer-pill warning';
+      }
+    }, 1000);
+  }
+
+  timerPill.onclick = () => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerSeconds = 0;
+      timerDisplay.textContent = '00:00 / 05:00';
+      timerPill.className = 'timer-pill';
+    } else {
+      startTimer();
+    }
+  };
+
+  // Start timer on first user interaction
+  window.addEventListener('click', startTimer, { once: true });
+  window.addEventListener('keydown', startTimer, { once: true });
+
+  updateSlide();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BLACK TAG — CyberCity General Hospital</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23171310'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23b79554'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/blacktag/blacktag.css">
+</head>
+<body class="bt">
+
+<canvas id="ward" aria-hidden="true"></canvas>
+<div id="wardfail" class="wardfail" hidden></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="shell" data-stage="brief">
+
+  <!-- ─── status bar ─────────────────────────────────────────────── -->
+  <header class="bar">
+    <div class="mark">
+      <span class="mark-t">BLACK<i>TAG</i></span>
+      <span class="mark-s">CyberCity General · incident CCG-2026-0919</span>
+    </div>
+
+    <nav class="rail" id="rail">
+      <button class="rail-i" data-go="brief"><b>01</b> The night</button>
+      <button class="rail-i" data-go="impact"><b>02</b> Impact</button>
+      <button class="rail-i" data-go="triage"><b>03</b> Triage</button>
+      <button class="rail-i" data-go="restore"><b>04</b> Restore</button>
+      <button class="rail-i" data-go="reckoning"><b>05</b> Reckoning</button>
+    </nav>
+
+    <div class="clock">
+      <div class="clk" id="clk">02:14</div>
+      <div class="clk-s" id="clkday">Saturday · minute zero</div>
+    </div>
+  </header>
+
+  <!-- ─── stage 01 · brief ───────────────────────────────────────── -->
+  <section class="stage st-brief" data-for="brief">
+    <div class="brief-l">
+      <p class="over">Saturday, 02:14</p>
+      <h1>The push came through<br>Group Policy.</h1>
+      <p class="lede">Which means it came from inside. Two domain controllers first, then the file
+      servers, then everything that trusted them. By the time the on-call phone rang, eleven minutes
+      of it had already happened.</p>
+      <p class="lede">The account it rode in on belonged to an imaging maintenance contractor and had
+      no second factor. It had been in the estate for nine days. 340 GB left the building before a
+      single file was encrypted.</p>
+      <p class="sig">Four people work in this department.</p>
+    </div>
+
+    <div class="brief-r">
+      <div class="crew">
+        <div class="crew-i">
+          <div class="crew-n">Paul</div>
+          <div class="crew-r">IT manager</div>
+          <div class="crew-d">Fourteen years here. The only person who knows where the offline recovery media is kept. Hour 31.</div>
+        </div>
+        <div class="crew-i">
+          <div class="crew-n">François</div>
+          <div class="crew-r">Systems &amp; network</div>
+          <div class="crew-d">Twenty-six, seven months in the post, holding a firewall he did not configure.</div>
+        </div>
+        <div class="crew-i">
+          <div class="crew-n">Lou</div>
+          <div class="crew-r">Clinical applications</div>
+          <div class="crew-d">The only person who knows what the record system looks like when it is working. Every ward phones her directly.</div>
+        </div>
+        <div class="crew-i">
+          <div class="crew-n">Fred</div>
+          <div class="crew-r">Service desk, part-time</div>
+          <div class="crew-d">Final-year student, three days a week. Since Saturday the phone has been the entire job.</div>
+        </div>
+      </div>
+
+      <div class="maths">
+        <p>Restoring a server is not copying a file. It is rebuild, re-trust, and then somebody who
+        knows what the system looks like when it is working has to sit down and confirm that it is.
+        In this hospital that person is Lou, and there is one of her.</p>
+        <div class="maths-row">
+          <div><b>204</b><span>systems encrypted</span></div>
+          <div class="op">÷</div>
+          <div><b>9</b><span>validated per day</span></div>
+          <div class="op">=</div>
+          <div class="hot"><b>23</b><span>days</span></div>
+        </div>
+        <p class="thin">The 2019 disaster recovery plan ranks all 204 of them. It does not
+        say which ones to skip.</p>
+      </div>
+
+      <button class="act" id="begin">Begin the incident</button>
+    </div>
+  </section>
+
+  <!-- ─── stage 02 · impact ──────────────────────────────────────── -->
+  <section class="stage st-impact" data-for="impact">
+    <div class="imp-head">
+      <p class="over">Encryption in progress</p>
+      <h2 id="impNow">—</h2>
+    </div>
+    <ul class="falling" id="falling"></ul>
+    <div class="imp-foot" id="impFoot" hidden>
+      <p>Everything the hospital does electronically is now unavailable. Nothing has been decided yet.</p>
+      <button class="act" id="toTriage">Open the board</button>
+    </div>
+  </section>
+
+  <!-- ─── stage 03/04 · board ────────────────────────────────────── -->
+  <section class="stage st-board" data-for="triage restore">
+    <div class="board-head">
+      <div>
+        <p class="over" id="boardOver">Triage</p>
+        <h2 id="boardTitle">Tag every service before anything is restored.</h2>
+        <p class="boardSub" id="boardSub">Red, amber and green will be restored, in the order you
+        choose. Black will not be restored at all. That is the whole instrument.</p>
+      </div>
+      <div class="board-act">
+        <button class="act" id="loadPlan">Load the 2019 plan</button>
+        <button class="ghost" id="stopHere" hidden>Stop here and count it</button>
+        <button class="act" id="startRestore" disabled>Start restoring</button>
+      </div>
+    </div>
+
+    <div class="lane" id="lane" hidden>
+      <div class="lane-box lane-now">
+        <span class="lane-l">Validation lane &middot; Lou, one at a time</span>
+        <div class="lane-n" id="laneName">Idle</div>
+        <div class="lane-bar"><i id="laneBar"></i></div>
+        <div class="lane-d" id="laneDays">nothing is being validated</div>
+      </div>
+      <div class="lane-box lane-q">
+        <span class="lane-l">Next up</span>
+        <ol class="queue" id="queue"></ol>
+      </div>
+      <div class="lane-box lane-t">
+        <span class="lane-l">Incident clock</span>
+        <div class="tbtns">
+          <button class="tb tb-run" id="pause">Pause</button>
+          <button class="tb sp" data-sp="0.5">0.5&times;</button>
+          <button class="tb sp" data-sp="1">1&times;</button>
+          <button class="tb sp" data-sp="2">2&times;</button>
+          <button class="tb sp" data-sp="4">4&times;</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="prompt" id="prompt" hidden></p>
+
+    <div class="cols" id="cols">
+      <div class="col" data-tag="down"><header>Untagged <span id="cDown">0</span></header><div class="drop" id="dDown"></div></div>
+      <div class="col" data-tag="red"><header>Red <em>restore first</em> <span id="cRed">0</span></header><div class="drop" id="dRed"></div></div>
+      <div class="col" data-tag="amber"><header>Amber <em>restore after</em> <span id="cAmber">0</span></header><div class="drop" id="dAmber"></div></div>
+      <div class="col" data-tag="green"><header>Green <em>can wait</em> <span id="cGreen">0</span></header><div class="drop" id="dGreen"></div></div>
+      <div class="col col-black" data-tag="black"><header>Black <em>not restoring</em> <span id="cBlack">0</span></header><div class="drop" id="dBlack"></div></div>
+    </div>
+  </section>
+
+  <!-- ─── stage 05 · reckoning ───────────────────────────────────── -->
+  <section class="stage st-reck" data-for="reckoning">
+    <div class="reck-grid">
+      <div class="reck-race">
+        <p class="over">What it cost</p>
+        <h2>Your order against the plan&rsquo;s.</h2>
+        <div class="race" id="race"></div>
+        <p class="reck-note" id="reckNote"></p>
+        <div class="paid" id="paid"></div>
+      </div>
+      <div class="reck-led">
+        <p class="over">Signed decisions <span class="chain" id="chainState"></span></p>
+        <div class="led" id="led"></div>
+        <p class="thin">Hash-chained, so that the decision made at 04:12 still reads the same way in
+        the review six months later, and Paul is not the only person holding it.</p>
+        <button class="ghost" id="again">Run it again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── readouts ───────────────────────────────────────────────── -->
+  <aside class="meters" id="meters" hidden>
+    <div class="m m-rate">
+      <span class="m-l">Harm accruing now</span>
+      <b class="m-v" id="mRate">0<small>/day</small></b>
+      <span class="m-d" id="mRateD">patients per day, while these systems are down</span>
+    </div>
+    <div class="m">
+      <span class="m-l">Patients affected</span>
+      <b class="m-v" id="mAff">0</b>
+      <span class="m-d">cumulative since 02:14</span>
+    </div>
+    <div class="m m-sev">
+      <span class="m-l">Missed time-critical care</span>
+      <b class="m-v" id="mSev">0</b>
+      <span class="m-d">stroke, STEMI, transfusion, fractionation</span>
+    </div>
+  </aside>
+
+  <section class="logwrap" id="logwrap" hidden>
+    <div class="log-grip" id="logGrip" title="Drag to resize · double-click to reset"></div>
+    <header>Incident log</header>
+    <ol class="log" id="log"></ol>
+  </section>
+
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+window.BT = {
+  capacity: 9,
+  total: 204,
+  horizon: 22.7,
+  services: [
+    {id:'ad',name:'Identity & domain services',dept:'Core infrastructure',systems:12,tolerance_h:null,affected_day:0,severe_day:0,tier2019:1,gate:true,note:'Two domain controllers, both encrypted. Nothing else authenticates until this is back.',cost:'Paul is the only person who knows where the offline recovery media is kept.'},
+    {id:'ehr',name:'Patient record & order entry',dept:'Core clinical',systems:24,tolerance_h:4,affected_day:120,severe_day:1.4,tier2019:2,note:'Every ward, every order, every allergy list. On paper the hospital runs at roughly 40 per cent.',cost:'Medication rounds revert to handwritten charts. Pharmacy catches some of the errors.'},
+    {id:'pacs',name:'Imaging & radiology reporting',dept:'Radiology',systems:18,tolerance_h:4.5,affected_day:48,severe_day:1.6,tier2019:8,note:'Scanners still acquire. Nothing can be read, compared against priors, or reported.',cost:'Thrombolysis window for acute stroke is 4.5 hours. Decisions get made on the registrar’s read alone.'},
+    {id:'lis',name:'Laboratory & blood bank',dept:'Pathology',systems:14,tolerance_h:6,affected_day:62,severe_day:0.9,tier2019:9,note:'Analysers run standalone. Results cannot be matched to a patient without transcription.',cost:'Type-and-screen goes manual. O-negative stock is the ceiling on how long that works.'},
+    {id:'cardio',name:'ECG transfer & cath lab',dept:'Cardiology',systems:9,tolerance_h:1.5,affected_day:20,severe_day:1.1,tier2019:11,note:'Twelve-lead traces cannot leave the machine they were recorded on.',cost:'Door-to-balloon target is 90 minutes. A walked printout is not 90 minutes.'},
+    {id:'pharm',name:'Pharmacy & medication ordering',dept:'Pharmacy',systems:11,tolerance_h:12,affected_day:40,severe_day:0.6,tier2019:7,note:'Stock levels, interaction checking and dose calculation, all in one system.',cost:'Body-surface-area chemotherapy dosing done by hand is where errors live.'},
+    {id:'onco',name:'Radiotherapy planning',dept:'Oncology',systems:7,tolerance_h:48,affected_day:14,severe_day:0.5,tier2019:12,note:'Treatment plans and linac scheduling. The linacs themselves are fine.',cost:'An interrupted fractionation course loses efficacy. That is not recoverable later.'},
+    {id:'theatre',name:'Theatre scheduling',dept:'Surgery',systems:8,tolerance_h:24,affected_day:26,severe_day:0.2,tier2019:10,note:'Lists, consent records, implant tracking, instrument trays.',cost:'Elective lists cancel first. Then the semi-urgent ones start to age.'},
+    {id:'beds',name:'Bed management & patient flow',dept:'Operations',systems:6,tolerance_h:24,affected_day:16,severe_day:0.1,tier2019:13,note:'Who is in which bed, and which beds are clean.',cost:'The emergency department stops being able to say whether it can accept.'},
+    {id:'biomed',name:'Medical device gateways',dept:'Biomedical',systems:21,tolerance_h:8,affected_day:24,severe_day:0.4,tier2019:14,note:'1,100 networked devices. 38 per cent past end-of-support, none patchable without revalidation.',cost:'Yann is a contractor, off site, and his revalidation paperwork takes six weeks.'},
+    {id:'dialysis',name:'Renal scheduling',dept:'Renal',systems:4,tolerance_h:72,affected_day:30,severe_day:0.8,tier2019:15,note:'Three sessions a week per patient, 96 patients, allocated by one spreadsheet server.',cost:'Missing a third session is not an inconvenience. It is a hospital admission.'},
+    {id:'roster',name:'Staff rostering & payroll',dept:'HR / Finance',systems:9,tolerance_h:168,affected_day:3,severe_day:0,tier2019:3,note:'Tier 1 in the 2019 plan because the payroll contract carries the largest penalty clause.',cost:'Nobody is paid late for three weeks. Everybody still turns up.'},
+    {id:'diet',name:'Catering & dietetics ordering',dept:'Facilities',systems:5,tolerance_h:36,affected_day:8,severe_day:0,tier2019:16,note:'Ward meal orders, allergen flags, enteral feed scheduling.',cost:'Kitchen reverts to a standing order and a clipboard. It worked in 2004.'},
+    {id:'intranet',name:'Intranet & internal communications',dept:'IT',systems:7,tolerance_h:96,affected_day:2,severe_day:0,tier2019:4,note:'Policies, phone directory, the downtime procedures themselves.',cost:'The paper downtime forms reference a switchboard number that changed in 2021.'},
+    {id:'archive',name:'Legacy imaging archive 2009–2014',dept:'Radiology',systems:18,tolerance_h:null,affected_day:0,severe_day:0,tier2019:5,note:'Proprietary format. The vendor left the market in 2016 and no current workstation can open it.',cost:'Retention policy says keep it. Nobody has successfully read from it since 2019.'},
+    {id:'research',name:'Oncology trial data store',dept:'Research',systems:31,tolerance_h:null,affected_day:0,severe_day:0,tier2019:6,note:'Five years of a phase II trial. 31 systems, the largest single block in the estate.',cost:'No acute patient harm. This is somebody’s career and 340 consented participants.'}
+  ],
+  events: [
+    {day:0.07,svc:'ehr',t:'03:55',w:'Ward 4 asks for an allergy list for a patient in bed 12. There is no allergy list. Fred writes the request on a sticky note and takes it to the ward himself.'},
+    {day:0.14,svc:'cardio',t:'05:40',w:'Chest pain in resus. The 12-lead is on the machine and only on the machine. A healthcare assistant runs the printout to the cath lab. Eleven minutes.'},
+    {day:0.22,svc:'pacs',t:'07:30',w:'Stroke call. CT acquired at 07:31, no reporting, no priors. The registrar reads it off the console. Thrombolysis given at 07:58 on one pair of eyes.'},
+    {day:0.30,svc:null,t:'09:15',w:'Dr. Mercier asks Paul a question he cannot answer: can we keep accepting ambulances. He says he will know by this afternoon. He does not know by this afternoon.'},
+    {day:0.55,svc:'lis',t:'15:20',w:'Blood bank moves to manual crossmatch. Two units of O-negative on the shelf, four in transit from the regional centre.'},
+    {day:0.9,svc:'ehr',t:'23:40',w:'Fourth medication round on paper. Pharmacy flags two dose errors caught before administration. Nobody can say how many were not caught.'},
+    {day:1.3,svc:'beds',t:'Day 2, 10:05',w:'The emergency department cannot state its own capacity. Regional coordination starts routing around the hospital by default.'},
+    {day:1.6,svc:'theatre',t:'Day 2, 17:30',w:'Tomorrow’s elective list is cancelled in full. 31 patients, one of whom has now been cancelled twice.'},
+    {day:2.1,svc:'onco',t:'Day 3, 08:00',w:'Radiotherapy suspends. Fourteen patients mid-course. Oncology asks, in writing, when planning comes back, and wants the answer in days.'},
+    {day:2.4,svc:'biomed',t:'Day 3, 14:10',w:'Yann emails from a hotel in Ankara. He can be on site Monday. It is Tuesday.'},
+    {day:3.0,svc:'dialysis',t:'Day 4, 07:00',w:'Renal has been running from a whiteboard since Saturday. Three patients have now missed a second session.'},
+    {day:3.5,svc:null,t:'Day 4, 19:00',w:'The group posts 340 GB of the trial data store to a leak site. It was taken nine days before anything was encrypted. Restoring it changes nothing about that.'},
+    {day:4.2,svc:'pharm',t:'Day 5, 11:30',w:'A chemotherapy dose is recalculated by hand for the third time in a week. The pharmacist asks for a second checker and cannot find a free one.'},
+    {day:5.0,svc:null,t:'Day 6, 09:00',w:'Lou has been validating restores for six days. She has taken one day off in that time and spent it answering her phone.'},
+    {day:6.5,svc:'pacs',t:'Day 7, 12:00',w:'Radiology has a backlog of 1,240 unreported studies. The backlog is now its own clinical risk, separate from the outage.'},
+    {day:9.0,svc:null,t:'Day 10, 08:00',w:'The regulator’s 72-hour notification went out on day three. The follow-up report is due and nobody has had time to write it.'},
+    {day:14.0,svc:null,t:'Day 15, 08:00',w:'Two weeks. The hospital is running, in the sense that patients are being treated. It is not running in the sense anybody would recognise.'},
+    {day:21.0,svc:null,t:'Day 22, 08:00',w:'François hands in his notice. He withdraws it four days later. Paul never mentions it again.'}
+  ]
+};
+</script>
+<script src="assets/blacktag/vendor/three.min.js"></script>
+<script src="assets/blacktag/vendor/pp/CopyShader.js"></script>
+<script src="assets/blacktag/vendor/pp/LuminosityHighPassShader.js"></script>
+<script src="assets/blacktag/vendor/pp/EffectComposer.js"></script>
+<script src="assets/blacktag/vendor/pp/RenderPass.js"></script>
+<script src="assets/blacktag/vendor/pp/ShaderPass.js"></script>
+<script src="assets/blacktag/vendor/pp/UnrealBloomPass.js"></script>
+<script src="assets/blacktag/ward.js"></script>
+<script src="assets/blacktag/blacktag.js"></script>
+</body>
+</html>
