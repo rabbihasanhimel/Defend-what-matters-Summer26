@@ -1,0 +1,49 @@
+https://zkarapanceva.github.io/iacyc_hackathon/
+
+Get this info about the hackathon. Our name is "The turkish delights" and we picked track A. Our project is to protect hospitals from ransomware, from protection/prevention measures to the attack stealthy strategy to disaster recovery
+Read a page
+
+Here's the rundown for The Turkish Delights, Track A ("Resilience Under Attack") — this is a strong fit, since hospital ransomware defense is literally one of the listed example projects ("Forensic triage for a four-person hospital IT team").
+Event shape
+
+    Thu 17 Sept — Kick-off. Pitches, teams form, you leave with your track and a one-sentence scope. (Today!)
+    Thu–Fri — Build time, your own hours around the conference.
+    Fri 18 Sept — The Exchange: 1 hour, every team posts its hardest blocker, other teams help. Not scored directly, but breaks ties and earns the Best Collaborators certificate.
+    Sat 19 Sept, 09:00–14:00 — Finishing sprint (100 min, hard stop at 10:50), presentation prep, backup recording, tech check, then 5-min presentations + 3-min Q&A, deliberation, awards.
+
+The scenario you're building for
+
+CyberCity: a fictional coastal city of ~400,000, mid-incident. Relevant to you — the hospital's scheduling is degraded, and it's staffed by a four-person IT team who are tired and outnumbered. That four-person team is your explicit "defender" — name them specifically in your pitch.
+Scope discipline — this matters a lot for your idea
+
+Your current framing ("protection/prevention → stealthy attacker strategy → disaster recovery") spans the whole kill chain, which is exactly the trap the brief warns against:
+
+    "Before you write a line of code, write one sentence: 'Our project lets [who] [do what] when [what happens].' If that sentence contains the word 'and,' cut it in half and pick the better half."
+
+They explicitly say: build one capability, working — not a system covering prevention and detection and recovery. You'll want to pick the single strongest slice (e.g., forensic triage tooling for the 4-person team, or an anomaly detector that catches the ransomware's lateral movement, or a recovery/restore playbook) rather than all three phases at once.
+Required for the demo
+
+    The adversary moment: you must actually trigger the attack/malicious input live and show your prototype responding — not describe it.
+    Non-code prototypes (tabletop exercises, playbooks) are judged identically to software, so a disaster-recovery playbook walked through minute-by-minute is a legitimate submission if that's your angle.
+
+Judging weights
+
+Idea & innovation 40 · Implementation & demo 25 · Presentation 20 · Impact & feasibility 15. Idea is weighted heaviest — a sharp, specific insight beats a broad build.
+Saturday deliverables
+
+    Live demo (+ backup recording)
+    5-min presentation + 3-min Q&A
+    One-page team sheet (problem, defender, what you built, next steps, AI tools used)
+    Link to repo/files/docs
+
+House rules to flag now
+
+    No testing against real systems — your ransomware simulation must run against your own lab/sandbox, never anything live.
+    No real personal data — synthetic hospital data only.
+    AI tool use is fine and expected, just declare it on the team sheet.
+
+Want help turning this into that one sharp "Our project lets ___ do ___ when ___" sentence before your Thursday pitch?
+
+Yep, and a walkthrough
+
+Since the brief is strict about picking one capability (not prevention+attack+recovery as three features), the sentence and the walkthrough both hinge on which slice you actually build. A few natural options for "hospital ransomware defense," all still framed around the four-person IT team:
